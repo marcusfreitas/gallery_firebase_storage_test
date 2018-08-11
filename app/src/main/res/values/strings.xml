@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">GalleryTestApp</string>
     <string name="action_settings">Settings</string>
+    <string name="upload_success">Image Uploaded!</string>
+    <string name="pick_image_title">Pick an image</string>
+    <string name="pick_image_action">Action</string>
 </resources>
