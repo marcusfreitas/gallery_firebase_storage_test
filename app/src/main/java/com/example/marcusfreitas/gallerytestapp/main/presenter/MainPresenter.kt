@@ -1,20 +1,17 @@
 package com.example.marcusfreitas.gallerytestapp.main.presenter
 
 import android.app.Activity
-import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import com.example.marcusfreitas.gallerytestapp.main.contract.MainContract
 import com.example.marcusfreitas.gallerytestapp.main.navigation.MainNavigationControllerInterface
 import com.example.marcusfreitas.gallerytestapp.repository.RepositoryInterface
 import com.example.marcusfreitas.gallerytestapp.repository.model.UploadedImage
 import com.google.firebase.database.DatabaseError
+import com.theartofdev.edmodo.cropper.CropImage
 
 class MainPresenter(navigationController: MainNavigationControllerInterface,
                     repository: RepositoryInterface.RepositoryMethods) : MainContract.MainPresenterContract, RepositoryInterface.OnDataChanged {
-
-    companion object {
-        const val PICK_IMAGE_REQUEST_CODE = 1
-    }
 
     private val mNavigationController = navigationController
     private val mRepository = repository
@@ -43,31 +40,30 @@ class MainPresenter(navigationController: MainNavigationControllerInterface,
 
     override fun startDataObserver() {
         mRepository.startDataListener()
-//        mFragmentView?.setImageUrlList(mRepository.getUploadedImageList())
     }
 
-    override fun imagePickerResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun imagePickerResult(requestCode: Int, resultCode: Int, data: Uri) {
 
-        if (requestCode == PICK_IMAGE_REQUEST_CODE && resultCode == Activity.RESULT_OK
-        && data != null && data.data != null) {
-            val imageUri = data.data
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
 
-            mRepository.uploadImage(imageUri, object : RepositoryInterface.OnUploadImage {
-                override fun onSuccess(imageUrl: String) {
-                    mActivityView?.showSuccessMessage()
-                }
+            if (resultCode == Activity.RESULT_OK) {
 
-                override fun onError(throwable: Throwable) {
-                    mActivityView?.showErrorMessage(throwable)
-                }
+                mRepository.uploadImage(data, object : RepositoryInterface.OnUploadImage {
+                    override fun onSuccess(imageUrl: String) {
+                        mActivityView?.showSuccessMessage()
+                    }
 
-            })
+                    override fun onError(throwable: Throwable) {
+                        mActivityView?.showErrorMessage(throwable)
+                    }
+
+                })
+            }
         }
-
     }
 
-    override fun fabButtonClick(requestCode: Int) {
-        mNavigationController.openImagePicker(requestCode)
+    override fun fabButtonClick() {
+        mNavigationController.openImagePicker()
     }
 
     // OnDataChanged

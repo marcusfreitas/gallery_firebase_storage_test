@@ -1,15 +1,15 @@
 package com.example.marcusfreitas.gallerytestapp.main.presenter
 
 import android.app.Activity
-import android.content.Intent
 import android.net.Uri
 import com.example.marcusfreitas.gallerytestapp.main.contract.MainContract
 import com.example.marcusfreitas.gallerytestapp.main.navigation.MainNavigationControllerInterface
 import com.example.marcusfreitas.gallerytestapp.repository.RepositoryInterface
 import com.example.marcusfreitas.gallerytestapp.repository.model.UploadedImage
 import com.nhaarman.mockitokotlin2.*
-import org.junit.Test
+import com.theartofdev.edmodo.cropper.CropImage
 import org.junit.Before
+import org.junit.Test
 
 class MainPresenterTest {
 
@@ -38,7 +38,6 @@ class MainPresenterTest {
         presenter.startDataObserver()
 
         verify(repositoryMock, times(1)).startDataListener()
-        verify(fragmentViewMock, times(1)).setImageUrlList(eq(arrayListOf(uploadedImage)))
     }
 
     @Test
@@ -46,11 +45,7 @@ class MainPresenterTest {
 
         val imageUriMock = mock<Uri>()
 
-        val intentMock = mock<Intent> {
-            on { data }.thenReturn(imageUriMock)
-        }
-
-        presenter.imagePickerResult(1, Activity.RESULT_OK, intentMock)
+        presenter.imagePickerResult(CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE, Activity.RESULT_OK, imageUriMock)
 
         verify(repositoryMock, times(1)).uploadImage(eq(imageUriMock), any())
     }
@@ -60,34 +55,16 @@ class MainPresenterTest {
 
         val imageUriMock = mock<Uri>()
 
-        val intentMock = mock<Intent> {
-            on { data }.thenReturn(imageUriMock)
-        }
-
-        presenter.imagePickerResult(1, Activity.RESULT_CANCELED, intentMock)
-
-        verify(repositoryMock, times(0)).uploadImage(eq(imageUriMock), any())
-    }
-
-    @Test
-    fun imagePickerResult_WhenIntentDataNull() {
-
-        val imageUriMock = mock<Uri>()
-
-        val intentMock = mock<Intent> {
-            on { data }.thenReturn(null)
-        }
-
-        presenter.imagePickerResult(1, Activity.RESULT_OK, intentMock)
+        presenter.imagePickerResult(CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE, Activity.RESULT_CANCELED, imageUriMock)
 
         verify(repositoryMock, times(0)).uploadImage(eq(imageUriMock), any())
     }
 
     @Test
     fun fabButtonClick() {
-        presenter.fabButtonClick(1)
+        presenter.fabButtonClick()
 
-        verify(navigationControllerMock, times(1)).openImagePicker(eq(1))
+        verify(navigationControllerMock, times(1)).openImagePicker()
     }
 
 

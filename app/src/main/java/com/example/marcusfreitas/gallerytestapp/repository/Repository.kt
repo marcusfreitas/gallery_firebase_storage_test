@@ -2,7 +2,6 @@ package com.example.marcusfreitas.gallerytestapp.repository
 
 import android.net.Uri
 import com.example.marcusfreitas.gallerytestapp.repository.model.UploadedImage
-import com.example.marcusfreitas.gallerytestapp.repository.user.UserAuth
 import com.example.marcusfreitas.gallerytestapp.repository.user.UserAuthInterface
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -32,15 +31,23 @@ class Repository(storageReference: StorageReference, databaseReference: Database
         if (mUploadTask == null || mUploadTask?.isInProgress == false) {
             mUploadTask = fileReference.putFile(imageUri)
                     .addOnSuccessListener { snapshot ->
-                        val databaseReference = mDatabaseReference.push().key ?: mUserAuth.getUserId(true)
-                        val reference = snapshot.metadata?.reference
-                        reference?.downloadUrl?.addOnSuccessListener { downloadUri ->
-                            mDatabaseReference.child(databaseReference).setValue(
-                                    UploadedImage(name = uploadId,
-                                            url = downloadUri.toString()))
-                                    .addOnSuccessListener { listener.onSuccess(downloadUri.toString()) }
-                                    .addOnFailureListener { listener.onError(it) }
-                        }
+                        addToDatabase(snapshot, uploadId, listener)
+                    }
+                    .addOnFailureListener {
+                        listener.onError(it)
+                    }
+        }
+    }
+
+    private fun addToDatabase(snapshot: UploadTask.TaskSnapshot, uploadId: String,
+                              listener: RepositoryInterface.OnUploadImage) {
+        val databaseReference = mDatabaseReference.push().key ?: mUserAuth.getUserId(true)
+        val reference = snapshot.metadata?.reference
+        reference?.downloadUrl?.addOnSuccessListener { downloadUri ->
+            mDatabaseReference.child(databaseReference).setValue(
+                    UploadedImage(name = uploadId, url = downloadUri.toString()))
+                    .addOnSuccessListener {
+                        listener.onSuccess(downloadUri.toString())
                     }
                     .addOnFailureListener {
                         listener.onError(it)

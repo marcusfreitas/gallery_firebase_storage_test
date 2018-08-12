@@ -2,12 +2,10 @@ package com.example.marcusfreitas.gallerytestapp.repository
 
 import android.net.Uri
 import com.example.marcusfreitas.gallerytestapp.repository.model.UploadedImage
-import com.example.marcusfreitas.gallerytestapp.repository.user.UserAuth
 import com.example.marcusfreitas.gallerytestapp.repository.user.UserAuthInterface
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.StorageTask
@@ -15,16 +13,8 @@ import com.google.firebase.storage.UploadTask
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
 
 class RepositoryTest {
-
-    /*
-        I'll let these tests as it is because I was spending too much time creating those
-        and it's really hard test Firebase functions, as I don't want to delay more to
-        delivery this test submission, I'll let this class test unfinished and focus more on the presenter's
-        that is the class that will use this repository functions
-    */
 
     private lateinit var storageReferenceMock: StorageReference
     private lateinit var databaseReferenceMock: DatabaseReference
@@ -144,27 +134,9 @@ class RepositoryTest {
 
         val onDataChangedMock = mock<RepositoryInterface.OnDataChanged>()
 
-        val uploadedImage = UploadedImage("test", "http://test.jpg")
-
-        val dataSnapshotMock = mock<DataSnapshot> {
-            on { getValue(UploadedImage::class.java) }.thenReturn(uploadedImage)
-        }
-
-        val snapshotList = listOf(dataSnapshotMock)
-
-        val dataSnapshotListMock = mock<DataSnapshot> {
-            on { children }.thenReturn(snapshotList)
-        }
-
-//        doAnswer {
-//            val listener: ValueEventListener = it.getArgument<ValueEventListener>(0)
-//            listener.onDataChange(dataSnapshotListMock)
-//        }.whenever(databaserReferenceMock).addValueEventListener(any())
-
         repository.startDataListener()
         repository.mOnDataChangedListener = onDataChangedMock
 
         verify(databaseReferenceMock, times(1)).addValueEventListener(any())
-//        verify(onDataChangedMock, times(1)).updatedData(eq(listOf(uploadedImage)))
     }
 }

@@ -5,4 +5,5 @@
     <string name="pick_image_title">Pick an image</string>
     <string name="pick_image_action">Action</string>
     <string name="grid_title">Gallery Test App</string>
+    <string name="select_picture">Select Picture</string>
 </resources>

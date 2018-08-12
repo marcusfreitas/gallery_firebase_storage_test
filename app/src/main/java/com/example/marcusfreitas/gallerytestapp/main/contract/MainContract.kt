@@ -1,6 +1,6 @@
 package com.example.marcusfreitas.gallerytestapp.main.contract
 
-import android.content.Intent
+import android.net.Uri
 import com.example.marcusfreitas.gallerytestapp.repository.model.UploadedImage
 
 class MainContract {
@@ -9,8 +9,8 @@ class MainContract {
         fun detachFragmentView()
         fun attachActivityView(activityView: MainContract.MainActivityViewContract)
         fun detachActivityView()
-        fun imagePickerResult(requestCode: Int, resultCode: Int, data: Intent?)
-        fun fabButtonClick(requestCode: Int)
+        fun imagePickerResult(requestCode: Int, resultCode: Int, data: Uri)
+        fun fabButtonClick()
         fun startDataObserver()
     }
 
