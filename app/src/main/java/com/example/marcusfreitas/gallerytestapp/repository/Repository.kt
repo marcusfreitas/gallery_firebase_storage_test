@@ -3,6 +3,7 @@ package com.example.marcusfreitas.gallerytestapp.repository
 import android.net.Uri
 import com.example.marcusfreitas.gallerytestapp.repository.model.UploadedImage
 import com.example.marcusfreitas.gallerytestapp.repository.user.UserAuth
+import com.example.marcusfreitas.gallerytestapp.repository.user.UserAuthInterface
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -11,12 +12,12 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.StorageTask
 import com.google.firebase.storage.UploadTask
 
-class Repository(storageReference: StorageReference, databaseReference: DatabaseReference, userAuth: UserAuth) :
+class Repository(storageReference: StorageReference, databaseReference: DatabaseReference, userAuth: UserAuthInterface) :
         RepositoryInterface.RepositoryMethods {
 
     private val mStorageReference: StorageReference = storageReference
     private val mDatabaseReference: DatabaseReference = databaseReference
-    private val mUserAuth: UserAuth = userAuth
+    private val mUserAuth: UserAuthInterface = userAuth
 
     private val mUploadedImageList = arrayListOf<UploadedImage>()
 
@@ -24,18 +25,21 @@ class Repository(storageReference: StorageReference, databaseReference: Database
     var mOnDataChangedListener: RepositoryInterface.OnDataChanged? = null
 
     override fun uploadImage(imageUri: Uri, listener: RepositoryInterface.OnUploadImage) {
-        val fileReference = mStorageReference.child(imageUri.lastPathSegment)
+        val uploadId = mUserAuth.getRandomId()
+        val userStorageReference = mStorageReference.child(mUserAuth.getUserId(true))
+        val fileReference = userStorageReference.child(uploadId)
 
         if (mUploadTask == null || mUploadTask?.isInProgress == false) {
             mUploadTask = fileReference.putFile(imageUri)
-                    .addOnSuccessListener {
-                        val uploadId = mDatabaseReference.push().key ?: mUserAuth.getUserId(true)
-                        val reference = it.metadata?.reference
-                        if (reference != null) {
-                            mDatabaseReference.child(uploadId).setValue(
-                                    UploadedImage(name = imageUri.lastPathSegment,
-                                            url = reference.downloadUrl.toString()))
-                            listener.onSuccess(reference.downloadUrl.toString())
+                    .addOnSuccessListener { snapshot ->
+                        val databaseReference = mDatabaseReference.push().key ?: mUserAuth.getUserId(true)
+                        val reference = snapshot.metadata?.reference
+                        reference?.downloadUrl?.addOnSuccessListener { downloadUri ->
+                            mDatabaseReference.child(databaseReference).setValue(
+                                    UploadedImage(name = uploadId,
+                                            url = downloadUri.toString()))
+                                    .addOnSuccessListener { listener.onSuccess(downloadUri.toString()) }
+                                    .addOnFailureListener { listener.onError(it) }
                         }
                     }
                     .addOnFailureListener {

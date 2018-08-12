@@ -3,6 +3,7 @@ package com.example.marcusfreitas.gallerytestapp.repository
 import android.net.Uri
 import com.example.marcusfreitas.gallerytestapp.repository.model.UploadedImage
 import com.example.marcusfreitas.gallerytestapp.repository.user.UserAuth
+import com.example.marcusfreitas.gallerytestapp.repository.user.UserAuthInterface
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
@@ -26,22 +27,22 @@ class RepositoryTest {
     */
 
     private lateinit var storageReferenceMock: StorageReference
-    private lateinit var databaserReferenceMock: DatabaseReference
+    private lateinit var databaseReferenceMock: DatabaseReference
+    private lateinit var userAuthMock: UserAuthInterface
     private lateinit var repository: Repository
 
     @Before
     fun setup() {
         storageReferenceMock = mock()
-        databaserReferenceMock = mock()
-        repository = Repository(storageReferenceMock, databaserReferenceMock, UserAuth())
+        databaseReferenceMock = mock()
+        userAuthMock = mock()
+        repository = Repository(storageReferenceMock, databaseReferenceMock, userAuthMock)
     }
 
     @Test
     fun uploadImage_isCorrect() {
 
-        val imageUriMock = mock<Uri> {
-            on { lastPathSegment }.thenReturn("test.jpg")
-        }
+        val imageUriMock = mock<Uri>()
 
         val taskMock = mock<Task<Uri>> {
             on { result }.thenReturn(imageUriMock)
@@ -68,32 +69,41 @@ class RepositoryTest {
             on { addOnFailureListener(any()) }.thenReturn(storageTaskMock)
         }
 
-        val childStorageReferenceMock = mock<StorageReference> {
+        val fileStorageReferenceMock = mock<StorageReference> {
             on { putFile(imageUriMock) }.thenReturn(uploadTaskMock)
         }
 
-        whenever(storageReferenceMock.child("test.jpg")).thenReturn(childStorageReferenceMock)
+        val uploadId = "132456"
+        val userId = "test"
 
-        val uploadedDatabaseReference = mock<DatabaseReference> {
-            on { key }.thenReturn("123456")
+        whenever(userAuthMock.getRandomId()).thenReturn(uploadId)
+        whenever(userAuthMock.getUserId(true)).thenReturn(userId)
+
+        val userStorageReference = mock<StorageReference> {
+            on { child(uploadId) }.thenReturn(fileStorageReferenceMock)
         }
 
-        whenever(databaserReferenceMock.push()).thenReturn(uploadedDatabaseReference)
+        whenever(storageReferenceMock.child(userId)).thenReturn(userStorageReference)
+
+        val uploadedDatabaseReference = mock<DatabaseReference> {
+            on { key }.thenReturn("ABCDEF")
+        }
+
+        whenever(databaseReferenceMock.push()).thenReturn(uploadedDatabaseReference)
+
 
         val uploadImageListenerMock = mock<RepositoryInterface.OnUploadImage>()
 
         repository.uploadImage(imageUriMock, uploadImageListenerMock)
 
-        verify(childStorageReferenceMock, times(1)).putFile(imageUriMock)
+        verify(fileStorageReferenceMock, times(1)).putFile(imageUriMock)
 
     }
 
     @Test
     fun uploadImage_isInProgress() {
 
-        val imageUriMock = mock<Uri> {
-            on { lastPathSegment }.thenReturn("test.jpg")
-        }
+        val imageUriMock = mock<Uri>()
 
         val storageTaskMock = mock<StorageTask<UploadTask.TaskSnapshot>> {
             on { isInProgress }.thenReturn(true)
@@ -104,11 +114,21 @@ class RepositoryTest {
             on { addOnFailureListener(any()) }.thenReturn(storageTaskMock)
         }
 
-        val childStorageReferenceMock = mock<StorageReference> {
+        val uploadId = "132456"
+        val userId = "test"
+
+        whenever(userAuthMock.getRandomId()).thenReturn(uploadId)
+        whenever(userAuthMock.getUserId(true)).thenReturn(userId)
+
+        val fileStorageReferenceMock = mock<StorageReference> {
             on { putFile(imageUriMock) }.thenReturn(uploadTaskMock)
         }
 
-        whenever(storageReferenceMock.child("test.jpg")).thenReturn(childStorageReferenceMock)
+        val userStorageReference = mock<StorageReference> {
+            on { child(uploadId) }.thenReturn(fileStorageReferenceMock)
+        }
+
+        whenever(storageReferenceMock.child(userId)).thenReturn(userStorageReference)
 
         val uploadImageListenerMock = mock<RepositoryInterface.OnUploadImage>()
 
@@ -116,11 +136,11 @@ class RepositoryTest {
 
         repository.uploadImage(imageUriMock, uploadImageListenerMock)
 
-        verify(childStorageReferenceMock, times(0)).putFile(any())
+        verify(fileStorageReferenceMock, times(0)).putFile(any())
     }
 
     @Test
-    fun startDataListener() {
+    fun startDataObserver() {
 
         val onDataChangedMock = mock<RepositoryInterface.OnDataChanged>()
 
@@ -144,7 +164,7 @@ class RepositoryTest {
         repository.startDataListener()
         repository.mOnDataChangedListener = onDataChangedMock
 
-        verify(databaserReferenceMock, times(1)).addValueEventListener(any())
+        verify(databaseReferenceMock, times(1)).addValueEventListener(any())
 //        verify(onDataChangedMock, times(1)).updatedData(eq(listOf(uploadedImage)))
     }
 }

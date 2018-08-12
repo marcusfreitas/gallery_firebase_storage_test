@@ -41,9 +41,9 @@ class MainPresenter(navigationController: MainNavigationControllerInterface,
         mActivityView = null
     }
 
-    override fun loadData() {
+    override fun startDataObserver() {
         mRepository.startDataListener()
-        mFragmentView?.setImageUrlList(mRepository.getUploadedImageList())
+//        mFragmentView?.setImageUrlList(mRepository.getUploadedImageList())
     }
 
     override fun imagePickerResult(requestCode: Int, resultCode: Int, data: Intent?) {

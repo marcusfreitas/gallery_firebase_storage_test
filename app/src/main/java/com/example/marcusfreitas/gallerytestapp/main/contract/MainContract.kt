@@ -11,7 +11,7 @@ class MainContract {
         fun detachActivityView()
         fun imagePickerResult(requestCode: Int, resultCode: Int, data: Intent?)
         fun fabButtonClick(requestCode: Int)
-        fun loadData()
+        fun startDataObserver()
     }
 
     interface MainActivityViewContract {

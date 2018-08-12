@@ -2,11 +2,11 @@ package com.example.marcusfreitas.gallerytestapp.repository.user
 
 import java.util.*
 
-class UserAuth {
+class UserAuth : UserAuthInterface {
 
     private val mTestUserId = "test"
 
-    fun getUserId(isTestUser: Boolean) : String {
+    override fun getUserId(isTestUser: Boolean) : String {
         return if (isTestUser) {
             mTestUserId
         } else {
@@ -14,4 +14,5 @@ class UserAuth {
         }
     }
 
+    override fun getRandomId() : String = UUID.randomUUID().toString()
 }

@@ -1,8 +1,7 @@
-package com.example.marcusfreitas.gallerytestapp.main
+package com.example.marcusfreitas.gallerytestapp.main.view
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
@@ -30,10 +29,11 @@ class MainActivity : AppCompatActivity(), MainNavigationControllerInterface, Mai
         (fragment as MainActivityFragment).mPresenter = mPresenter
 
         fab.setOnClickListener { view ->
-            Snackbar.make(view, getString(R.string.pick_image_title), Snackbar.LENGTH_LONG)
-                    .setAction(getString(R.string.pick_image_action)) {
-                        mPresenter.fabButtonClick(MainPresenter.PICK_IMAGE_REQUEST_CODE)
-                    }.show()
+//            Snackbar.make(view, getString(R.string.pick_image_title), Snackbar.LENGTH_LONG)
+//                    .setAction(getString(R.string.pick_image_action)) {
+//
+//                    }.show()
+            mPresenter.fabButtonClick(MainPresenter.PICK_IMAGE_REQUEST_CODE)
         }
     }
 
@@ -75,6 +75,8 @@ class MainActivity : AppCompatActivity(), MainNavigationControllerInterface, Mai
 
         startActivityForResult(intent, requestCode)
     }
+
+    // MainActivityViewContract
 
     private fun showToastMessage(message: String, length: Int) {
         Toast.makeText(this, message, length).show()

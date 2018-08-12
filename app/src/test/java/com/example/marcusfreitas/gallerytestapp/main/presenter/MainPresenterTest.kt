@@ -35,7 +35,7 @@ class MainPresenterTest {
 
         whenever(repositoryMock.getUploadedImageList()).thenReturn(arrayListOf(uploadedImage))
 
-        presenter.loadData()
+        presenter.startDataObserver()
 
         verify(repositoryMock, times(1)).startDataListener()
         verify(fragmentViewMock, times(1)).setImageUrlList(eq(arrayListOf(uploadedImage)))
