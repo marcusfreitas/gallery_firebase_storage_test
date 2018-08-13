@@ -43,8 +43,9 @@ class MainActivity : AppCompatActivity(), MainNavigationControllerInterface, Mai
         super.onActivityResult(requestCode, resultCode, data)
 
         val result = CropImage.getActivityResult(data)
-        mPresenter?.imagePickerResult(requestCode, resultCode, result.uri)
-
+        if (result != null) {
+            mPresenter?.imagePickerResult(requestCode, resultCode, result.uri)
+        }
     }
 
     // Navigation Controller
