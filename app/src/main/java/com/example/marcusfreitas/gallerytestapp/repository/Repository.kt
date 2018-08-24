@@ -2,7 +2,9 @@ package com.example.marcusfreitas.gallerytestapp.repository
 
 import android.net.Uri
 import com.example.marcusfreitas.gallerytestapp.repository.model.UploadedImage
+import com.example.marcusfreitas.gallerytestapp.repository.model.UploadedImageInterface
 import com.example.marcusfreitas.gallerytestapp.repository.user.UserAuthInterface
+import com.google.android.gms.tasks.Task
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -13,6 +15,7 @@ import com.google.firebase.storage.UploadTask
 
 class Repository(storageReference: StorageReference, databaseReference: DatabaseReference, userAuth: UserAuthInterface) :
         RepositoryInterface.RepositoryMethods {
+
 
     private val mStorageReference: StorageReference = storageReference
     private val mDatabaseReference: DatabaseReference = databaseReference
@@ -45,7 +48,8 @@ class Repository(storageReference: StorageReference, databaseReference: Database
         val reference = snapshot.metadata?.reference
         reference?.downloadUrl?.addOnSuccessListener { downloadUri ->
             mDatabaseReference.child(databaseReference).setValue(
-                    UploadedImage(name = uploadId, url = downloadUri.toString()))
+                    UploadedImage(name = uploadId, url = downloadUri.toString(),
+                            databaseReference = databaseReference))
                     .addOnSuccessListener {
                         listener.onSuccess(downloadUri.toString())
                     }
@@ -79,6 +83,15 @@ class Repository(storageReference: StorageReference, databaseReference: Database
 
     override fun setOnDataChangedListener(listener: RepositoryInterface.OnDataChanged) {
         mOnDataChangedListener = listener
+    }
+
+    override fun deleteImage(uploadedImage: UploadedImageInterface): Task<Void>? {
+        val userStorageReference = mStorageReference.child(mUserAuth.getUserId(true))
+        val fileReference = userStorageReference.child(uploadedImage.name)
+
+        mDatabaseReference.child(uploadedImage.databaseReference).removeValue()
+
+        return fileReference.delete()
     }
 
 }

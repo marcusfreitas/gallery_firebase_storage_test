@@ -6,4 +6,11 @@
     <string name="pick_image_action">Action</string>
     <string name="grid_title">Gallery Test App</string>
     <string name="select_picture">Select Picture</string>
+    <string name="error_no_photo_load">Sorry it was not possible load the image</string>
+    <string name="detail_delete_menu_title">Delete</string>
+    <string name="delete_photo_error_message">Error at deleting this photo</string>
+    <string name="delete_confirm_title">Confirm</string>
+    <string name="delete_confirmation_text">Do you really want to delete?</string>
+    <string name="ok_button">Ok</string>
+    <string name="cancel_button">Cancel</string>
 </resources>

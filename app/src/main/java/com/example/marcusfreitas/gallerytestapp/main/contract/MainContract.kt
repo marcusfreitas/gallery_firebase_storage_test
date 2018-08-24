@@ -12,6 +12,8 @@ class MainContract {
         fun imagePickerResult(requestCode: Int, resultCode: Int, data: Uri)
         fun fabButtonClick()
         fun startDataObserver()
+        fun photoTap(uploadedImage: UploadedImage)
+        fun photoLongTap(uploadedImage: UploadedImage)
     }
 
     interface MainActivityViewContract {

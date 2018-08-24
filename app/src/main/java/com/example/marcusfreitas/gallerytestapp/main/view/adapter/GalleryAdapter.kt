@@ -10,7 +10,14 @@ import com.example.marcusfreitas.gallerytestapp.repository.model.UploadedImage
 import kotlinx.android.synthetic.main.gallery_list_item.view.*
 
 class GalleryAdapter(private var uploadImageList: List<UploadedImage>,
-                     private val glide: RequestManager) : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
+                     private val glide: RequestManager,
+                     private val clickListener: OnGalleryClick) : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
+
+
+    interface OnGalleryClick {
+        fun onClick(uploadedImage: UploadedImage)
+        fun onLongClick(uploadedImage: UploadedImage): Boolean
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.gallery_list_item, parent, false)
@@ -22,7 +29,7 @@ class GalleryAdapter(private var uploadImageList: List<UploadedImage>,
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindView(uploadImageList[position], glide)
+        holder.bindView(uploadImageList[position], glide, clickListener)
     }
 
     fun setDataSource(data: List<UploadedImage>) {
@@ -32,8 +39,16 @@ class GalleryAdapter(private var uploadImageList: List<UploadedImage>,
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        fun bindView(uploadedImage: UploadedImage, glide: RequestManager) {
+        fun bindView(uploadedImage: UploadedImage, glide: RequestManager, clickListener: OnGalleryClick) {
             glide.load(uploadedImage.url).into(itemView.thumbnail)
+
+            itemView.thumbnail.setOnClickListener {
+                clickListener.onClick(uploadedImage)
+            }
+
+            itemView.thumbnail.setOnLongClickListener {
+                clickListener.onLongClick(uploadedImage)
+            }
         }
     }
 

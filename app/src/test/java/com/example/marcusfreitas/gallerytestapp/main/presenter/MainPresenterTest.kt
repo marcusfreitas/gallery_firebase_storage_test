@@ -37,7 +37,7 @@ class MainPresenterTest {
 
         presenter.startDataObserver()
 
-        verify(repositoryMock, times(1)).startDataListener()
+        verify(repositoryMock).startDataListener()
     }
 
     @Test
@@ -47,7 +47,7 @@ class MainPresenterTest {
 
         presenter.imagePickerResult(CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE, Activity.RESULT_OK, imageUriMock)
 
-        verify(repositoryMock, times(1)).uploadImage(eq(imageUriMock), any())
+        verify(repositoryMock).uploadImage(eq(imageUriMock), any())
     }
 
     @Test
@@ -64,11 +64,15 @@ class MainPresenterTest {
     fun fabButtonClick() {
         presenter.fabButtonClick()
 
-        verify(navigationControllerMock, times(1)).openImagePicker()
+        verify(navigationControllerMock).openImagePicker()
     }
 
+    @Test
+    fun photoTap() {
+        val uploadedImage = UploadedImage()
+        presenter.photoTap(uploadedImage)
 
-
-
+        verify(navigationControllerMock).openDetailView(uploadedImage)
+    }
 
 }

@@ -76,4 +76,13 @@ class MainPresenter(navigationController: MainNavigationControllerInterface,
         mFragmentView?.showToastMessage(error.message, Toast.LENGTH_SHORT)
     }
 
+    override fun photoTap(uploadedImage: UploadedImage) {
+        mNavigationController.openDetailView(uploadedImage)
+    }
+
+    override fun photoLongTap(uploadedImage: UploadedImage) {
+//        uploadedImage.storageReference?.delete()
+
+    }
+
 }

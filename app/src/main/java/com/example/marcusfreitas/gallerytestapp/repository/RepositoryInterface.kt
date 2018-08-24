@@ -2,8 +2,9 @@ package com.example.marcusfreitas.gallerytestapp.repository
 
 import android.net.Uri
 import com.example.marcusfreitas.gallerytestapp.repository.model.UploadedImage
+import com.example.marcusfreitas.gallerytestapp.repository.model.UploadedImageInterface
+import com.google.android.gms.tasks.Task
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 
 class RepositoryInterface {
 
@@ -12,6 +13,7 @@ class RepositoryInterface {
         fun getUploadedImageList() : ArrayList<UploadedImage>
         fun startDataListener()
         fun setOnDataChangedListener(listener: OnDataChanged)
+        fun deleteImage(uploadedImage: UploadedImageInterface): Task<Void>?
     }
 
     interface OnUploadImage {

@@ -1,3 +1,4 @@
 package com.example.marcusfreitas.gallerytestapp.repository.model
 
-data class UploadedImage(val name: String = "", val url: String = "")
+open class UploadedImage(override var name: String = "", override var url: String = "",
+                         override var databaseReference: String = "") : UploadedImageInterface

@@ -49,7 +49,19 @@ class MainActivityFragment : Fragment(), MainContract.MainFragmentViewContract {
 
         val glide = Glide.with(this.context)
 
-        mGalleryAdapter = GalleryAdapter(mImageUrlList, glide)
+        mGalleryAdapter = GalleryAdapter(mImageUrlList, glide, object : GalleryAdapter.OnGalleryClick {
+            override fun onClick(uploadedImage: UploadedImage) {
+                mPresenter?.photoTap(uploadedImage)
+            }
+
+            override fun onLongClick(uploadedImage: UploadedImage): Boolean {
+                mPresenter?.photoLongTap(uploadedImage)
+
+                return true
+            }
+
+        })
+
         galleryRecyclerView.layoutManager = GridLayoutManager(this.context, 2)
         galleryRecyclerView.adapter = mGalleryAdapter
         galleryRecyclerView.setHasFixedSize(true)
